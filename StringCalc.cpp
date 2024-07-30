@@ -40,8 +40,9 @@ private:
             if(numbers[i] == '-'){
                 if(i == start) 
                     isNegative = true;
-                if(isDelimiter(numbers[i-1])) 
+                if((i-1)>=0 && isDelimiter(numbers[i-1])){
                     isNegative = true;
+                }
                 else{
                     string error = "------> Invalid Input";
                     throw error;
@@ -67,7 +68,11 @@ public:
         try{
             vector<int>neg=checkNegative(numbers);
             if(neg.size()!=0){
-                string error = "------> Negative Nums";
+                string error = "----> error: Negative Nums : ";
+                for(int i=0;i<neg.size();++i){
+                    error += to_string(neg[i]);
+                    error += " ";
+                }
                 throw error;
             }
             int start = checkDelimiter(numbers);
@@ -114,10 +119,22 @@ int main()
 
     StringCalculator calculator;
     string input;
+    char ch;
 
-    while(cin >> input){
-        if(input == "quit") break;
-        int ans = calculator.Add(input);
-        cout << "ans: " << ans << endl;
+    while (true) {
+        ch = cin.get();
+        if (ch == 'e') { 
+            if(input.back()=='\n'){
+                input.pop_back();
+            }
+            int ans = calculator.Add(input);
+            cout << "ans: " << ans << endl;
+            input="";
+            cin >> ws;
+            continue;
+        }
+        if(ch=='q')return 0;
+        input+=ch;
     }
+    
 }
