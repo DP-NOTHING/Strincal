@@ -16,7 +16,7 @@ private:
     int checkDelimiter(string numbers){
         if(numbers.size()>=3 && numbers[0] == '/' && numbers[1] == '/'){
             delimiters.push_back(numbers[2]);
-            return 6;
+            return 5;
         }
         return 0;
     }
