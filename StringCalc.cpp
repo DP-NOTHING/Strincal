@@ -1,3 +1,5 @@
+#define CATCH_CONFIG_RUNNER
+#include "catch.hpp"
 #include<bits/stdc++.h>
 using namespace std;
 
@@ -16,7 +18,7 @@ private:
     int checkDelimiter(string numbers){
         if(numbers.size()>=3 && numbers[0] == '/' && numbers[1] == '/'){
             delimiters.push_back(numbers[2]);
-            return 5;
+            return 4;
         }
         return 0;
     }
@@ -112,29 +114,69 @@ public:
     }
 };
 
+
+TEST_CASE("StringCalculator tests", "[StringCalculator]") {
+    StringCalculator calculator;
+
+    SECTION("Handles empty string") {
+        REQUIRE(calculator.Add("") == 0);
+    }
+
+    SECTION("Handles single number") {
+        REQUIRE(calculator.Add("4\n") == 4);
+    }
+
+    SECTION("Handles two numbers") {
+        REQUIRE(calculator.Add("1,2") == 3);
+    }
+}
+
+TEST_CASE("new line tests", "[StringCalculator]") {
+    StringCalculator calculator;
+
+    SECTION("Handles empty string") {
+        REQUIRE(calculator.Add("") == 0);
+    }
+
+    SECTION("Handles two number") {
+        REQUIRE(calculator.Add("4\n2") == 6);
+    }
+
+    SECTION("Handles multiple numbers") {
+        REQUIRE(calculator.Add("1,2\n3,1\n1") == 8);
+    }
+    SECTION("Handles multiple numbers with different delimiter") {
+        REQUIRE(calculator.Add("//:\n1:2\n3,1\n1") == 8);
+    }
+    
+}
+
 int main()
 {
     delimiters.push_back(',');
     delimiters.push_back('\n');
+    int result = Catch::Session().run();
 
-    StringCalculator calculator;
-    string input;
-    char ch;
+    if(result==0){
+        StringCalculator calculator;
+        string input;
+        char ch;
 
-    while (true) {
-        ch = cin.get();
-        if (ch == 'e') { 
-            if(input.back()=='\n'){
-                input.pop_back();
+        while (true) {
+            ch = cin.get();
+            if (ch == 'e') { 
+                if(input.back()=='\n'){
+                    input.pop_back();
+                }
+                int ans = calculator.Add(input);
+                cout << "ans: " << ans << endl;
+                input="";
+                cin >> ws;
+                continue;
             }
-            int ans = calculator.Add(input);
-            cout << "ans: " << ans << endl;
-            input="";
-            cin >> ws;
-            continue;
+            if(ch=='q')return 0;
+            input+=ch;
         }
-        if(ch=='q')return 0;
-        input+=ch;
     }
-    
+    return 0;
 }
