@@ -15,11 +15,11 @@ private:
     int checkDelimiter(string numbers){
         if(numbers.size() >= 3 && numbers[0] == '/' && numbers[1] == '/'){
             int index = 2;
-            while(numbers[index] != '\n'){ 
+            while(numbers[index] != '\n'){ // newline will be end of our custom delimiter declarations
                 delimiters.insert(numbers[index]);
                 index++;
             }
-            return index + 1; 
+            return index + 1; // return the position after the delimiter declaration end
         }
         return 0;
     }
@@ -140,10 +140,10 @@ TEST_CASE("new line tests", "[StringCalculator]") {
         REQUIRE(calculator.Add("1,2\n3,1\n1") == 8);
     }
     SECTION("Handles multiple numbers with different delimiter") {
-        REQUIRE(calculator.Add("
+        REQUIRE(calculator.Add("//:\n1:2\n3,1\n1") == 8);
     }
     SECTION("Handles multiple delimiter") {
-        REQUIRE(calculator.Add("
+        REQUIRE(calculator.Add("//:;\n1;2:3,4\n1\n1:2:1") == 15);
     }
     
 }
@@ -160,17 +160,17 @@ int main(){
 
         cout << "To submit string for processing, press e and then press enter.\nTo quit the program enter q.\n";
         while (true) {
-            ch = cin.get(); 
-            
+            ch = cin.get(); // read character by character. 
+            //specially used to scan newline as char
             if (ch == 'e') { 
                 if(input.back() == '\n'){
-                    input.pop_back(); 
+                    input.pop_back(); // remove last newline
                 }
                 int ans = calculator.Add(input);
                 cout << "ans: " << ans << endl;
-                input = ""; 
+                input = ""; // reset input for next calculation
                 cout << "Enter new string" << endl;
-                cin >> ws; 
+                cin >> ws; // clear whitespace for correct scanning of next string
                 continue;
             }
             if(ch == 'q') return 0; 
