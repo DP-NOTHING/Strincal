@@ -20,38 +20,86 @@ private:
         }
         return 0;
     }
-
-public:
-    int Add(string numbers){
-        if(numbers == "") return 0;
-        vector<int> Numbers;
+    vector<int>checkNegative(string numbers){
         string cur = "";
-       
+        vector<int> negNums;
+        bool isNegative = false;
         int start = checkDelimiter(numbers);
-        for(int i=start;i<numbers.size();i++){
+        for(int i=start;i<numbers.size();++i){
             if(isDelimiter(numbers[i])){
                 if(cur == ""){
                     string error = "------> Invalid Input";
                     throw error;
                 }
-                int curint = stoi(cur);
-                Numbers.push_back(curint);
+                int cu = stoi(cur);
+                if(isNegative) negNums.push_back(-cu);
                 cur = "";
+                isNegative = false;
                 continue;
             }
-            if(numbers[i] >= '0' && numbers[i] <= '9') 
-                cur += numbers[i];
-            else{
-                cout << "Invalid" << endl;
-                return -1;
+            if(numbers[i] == '-'){
+                if(i == start) 
+                    isNegative = true;
+                if(isDelimiter(numbers[i-1])) 
+                    isNegative = true;
+                else{
+                    string error = "------> Invalid Input";
+                    throw error;
+                }
+                continue;
             }
+            cur += numbers[i];
         }
-        if(cur != ""){
-            int curint = stoi(cur);
-            Numbers.push_back(curint);
-            cur = "";
+        if(cur!=""){
+            int cu = stoi(cur);
+            if(isNegative) 
+                negNums.push_back(-cu);
         }
+        return negNums;
+    }
+
+public:
+    int Add(string numbers)
+    {
+        if(numbers == "") return 0;
+        vector<int> Numbers;
+        string cur = "";
+        try{
+            vector<int>neg=checkNegative(numbers);
+            if(neg.size()!=0){
+                string error = "------> Negative Nums";
+                throw error;
+            }
+            int start = checkDelimiter(numbers);
+            for(int i=start;i<numbers.size();i++){
+                if(isDelimiter(numbers[i])){
+                    if(cur == ""){
+                        string error = "------> Invalid Input";
+                        throw error;
+                    }
+                    int cu = stoi(cur);
+                    Numbers.push_back(cu);
+                    cur = "";
+                    continue;
+                }
+                if(numbers[i] >= '0' && numbers[i] <= '9') 
+                    cur += numbers[i];
+                else{
+                    string error = "------> Invalid Input";
+                    throw error;
+                }
+            }
+            if(cur != ""){
+                int cu = stoi(cur);
+                Numbers.push_back(cu);
+                cur = "";
+            }
         
+        }
+        catch(string err){
+            cout<<err<<endl;
+            return -1;
+        }
         int ans = 0;
         for(int i=0;i<Numbers.size();++i)
             ans += Numbers[i];
