@@ -3,11 +3,9 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-unordered_set<char> delimiters; 
-
 class StringCalculator{
 private:
-   
+    unordered_set<char> delimiters;   
     bool isDelimiter(char c){
         return delimiters.find(c) != delimiters.end();
     }
@@ -24,55 +22,19 @@ private:
         return 0;
     }
 
-    vector<int> checkNegative(string numbers){
-        string cur = "";
-        vector<int> negNums;
-        bool isNegative = false;
-        int start = checkDelimiter(numbers); 
-        for(int i = start; i < numbers.size(); ++i){
-            if(isDelimiter(numbers[i])){
-                if(cur == ""){
-                    string error = "------> Invalid Input";
-                    throw error;
-                }
-                int cu = stoi(cur);
-                if(isNegative) negNums.push_back(-cu);
-                cur = "";
-                isNegative = false;
-                continue;
-            }
-            if(numbers[i] == '-'){
-                if(i == start || isDelimiter(numbers[i-1])){
-                    isNegative = true;
-                } else {
-                    string error = "------> Invalid Input";
-                    throw error;
-                }
-                continue;
-            }
-            cur += numbers[i];
-        }
-        if(cur != ""){
-            int cu = stoi(cur);
-            if(isNegative) negNums.push_back(-cu);
-        }
-        return negNums;
-    }
-
 public:
+    StringCalculator(){
+        delimiters.insert(','); 
+        delimiters.insert('\n'); 
+    }
     int Add(string numbers){
         if(numbers == "") return 0;
         vector<int> Numbers;
         string cur = "";
+        vector<int> negNums;
+        bool isStarpresent=false;
+        bool isNegative = false;
         try{
-            vector<int> neg = checkNegative(numbers); 
-            if(neg.size() != 0){
-                string error = "----> error: Negative Nums : ";
-                for(int i = 0; i < neg.size(); ++i){
-                    error += to_string(neg[i]) + " ";
-                }
-                throw error;
-            }
             int start = checkDelimiter(numbers); 
             for(int i = start; i < numbers.size(); i++){
                 if(isDelimiter(numbers[i])){
@@ -81,8 +43,22 @@ public:
                         throw error;
                     }
                     int cu = stoi(cur);
-                    Numbers.push_back(cu);
+                    if(isNegative) negNums.push_back(-cu);
+                    else Numbers.push_back(cu);
                     cur = "";
+                    isNegative = false;
+                    if(numbers[i]=='*'){
+                        isStarpresent=true;
+                    }
+                    continue;
+                }
+                else if(numbers[i] == '-'){
+                    if(i == start || isDelimiter(numbers[i-1])){
+                        isNegative = true;
+                    } else {
+                        string error = "------> Invalid Input";
+                        throw error;
+                    }
                     continue;
                 }
                 if(numbers[i] >= '0' && numbers[i] <= '9') 
@@ -94,7 +70,16 @@ public:
             }
             if(cur != ""){
                 int cu = stoi(cur);
-                Numbers.push_back(cu);
+                if(isNegative) negNums.push_back(-cu);
+                else Numbers.push_back(cu);
+            }
+
+            if(negNums.size()!=0){
+                string err= "----> error: Negative Nums : ";
+                for(int i = 0; i < negNums.size(); ++i){
+                    err += to_string(negNums[i]) + " ";
+                }
+                throw err;
             }
         
         }
@@ -102,9 +87,21 @@ public:
             cout << err << endl;
             return -1;
         }
-        int ans = 0;
-        for(int i = 0; i < Numbers.size(); ++i)
-            ans += Numbers[i];
+        int ans;
+        if(isStarpresent){
+            ans=1;
+        }
+        else{
+            ans=0;
+        }
+        for(int i = 0; i < Numbers.size(); ++i){
+            if(isStarpresent){
+                ans*=Numbers[i];
+            }
+            else{
+                ans += Numbers[i];
+            }
+        } 
         return ans;
     }
 };
@@ -145,12 +142,14 @@ TEST_CASE("new line tests", "[StringCalculator]") {
     SECTION("Handles multiple delimiter") {
         REQUIRE(calculator.Add("//:;\n1;2:3,4\n1\n1:2:1") == 15);
     }
+    SECTION("Handles multiplication when * is delimiter") {
+        REQUIRE(calculator.Add("//*\n1,2*3,1") == 6);
+    }
     
 }
 
 int main(){
-    delimiters.insert(','); 
-    delimiters.insert('\n'); 
+
     int result = Catch::Session().run();
 
     if(result == 0){
